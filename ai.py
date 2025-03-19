@@ -95,18 +95,22 @@ test_loss, test_mae = model.evaluate(val_dataset, verbose=0)
 print(f"\n📊 Performance du modèle sur les données de validation :\nMSE = {test_loss:.4f}, MAE = {test_mae:.4f} °C")
 
 # 11. Sauvegarde du modèle with explicit HDF5 format and fallback to SavedModel
+output_dir = os.path.dirname(__file__) or "."
 try:
-    model.save("thermochauffage_model.h5", save_format='h5')
-    print("Modèle sauvegardé sous 'thermochauffage_model.h5' avec succès.")
+    model_path = os.path.join(output_dir, "thermochauffage_model.h5")
+    model.save(model_path, save_format='h5', include_optimizer=True)
+    print(f"Modèle sauvegardé sous '{model_path}' avec succès.")
 except Exception as e:
     print(f"Erreur lors de la sauvegarde en HDF5 : {e}")
-    model.save("thermochauffage_model")  # SavedModel format as fallback
-    print("Modèle sauvegardé sous 'thermochauffage_model' (SavedModel) avec succès.")
+    model_path = os.path.join(output_dir, "thermochauffage_model")
+    model.save(model_path)  # SavedModel format as fallback
+    print(f"Modèle sauvegardé sous '{model_path}' (SavedModel) avec succès.")
 
 # 12. Sauvegarde du scaler pour une utilisation ultérieure
-with open("scaler.pkl", "wb") as f:
+scaler_path = os.path.join(output_dir, "scaler.pkl")
+with open(scaler_path, "wb") as f:
     pickle.dump(scaler, f)
-print("Scaler sauvegardé sous 'scaler.pkl' avec succès.")
+print(f"Scaler sauvegardé sous '{scaler_path}' avec succès.")
 
 # 13. Test sur un échantillon
 test_data = np.array([[1026, 0.8, 40, 80]])
